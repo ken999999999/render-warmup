@@ -2,7 +2,7 @@ name: Warm up Render at 05:50 (Asia/Taipei)
 
 on:
   schedule:
-    # GitHub Actions 用 UTC：台北 05:50 = UTC 前一天 21:50
+    # GitHub Actions uses UTC. Asia/Taipei 05:50 = 21:50 UTC (previous day)
     - cron: "50 21 * * *"
   workflow_dispatch:
 
@@ -10,44 +10,24 @@ jobs:
   warmup:
     runs-on: ubuntu-latest
     steps:
-      - name: Warm up (wait up to 180s, retry)
+      - name: Warm up Render (wait until 200)
         run: |
           URL="https://my-tdx-api.onrender.com/api/trains"
 
-          for i in {1..6}; do
-            echo "Attempt $i..."
-            if curl -fsS -I --max-time 180 "$URL" > /dev/null; then
+          # wait up to 8 minutes
+          deadline=$((SECONDS+480))
+
+          while [ $SECONDS -lt $deadline ]; do
+            code=$(curl -sS -L -I --max-time 60 -o /dev/null -w "%{http_code}" "$URL" || echo 000)
+            echo "HTTP $code"
+
+            if [ "$code" -ge 200 ] && [ "$code" -lt 400 ]; then
               echo "Warmup OK"
               exit 0
             fi
-            sleep 15
+
+            sleep 10
           done
 
-          echo "Warmup FAILED"
-          exit 1name: Warm up Render at 05:50 (Asia/Taipei)
-
-on:
-  schedule:
-    # GitHub Actions 用 UTC：台北 05:50 = UTC 前一天 21:50
-    - cron: "50 21 * * *"
-  workflow_dispatch:
-
-jobs:
-  warmup:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Warm up (wait up to 180s, retry)
-        run: |
-          URL="https://my-tdx-api.onrender.com/api/trains"
-
-          for i in {1..6}; do
-            echo "Attempt $i..."
-            if curl -fsS -I --max-time 180 "$URL" > /dev/null; then
-              echo "Warmup OK"
-              exit 0
-            fi
-            sleep 15
-          done
-
-          echo "Warmup FAILED"
+          echo "Warmup FAILED (timeout waiting for 2xx/3xx)"
           exit 1
