@@ -1,0 +1,53 @@
+name: Warm up Render at 05:50 (Asia/Taipei)
+
+on:
+  schedule:
+    # GitHub Actions 用 UTC：台北 05:50 = UTC 前一天 21:50
+    - cron: "50 21 * * *"
+  workflow_dispatch:
+
+jobs:
+  warmup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Warm up (wait up to 180s, retry)
+        run: |
+          URL="https://my-tdx-api.onrender.com/api/trains"
+
+          for i in {1..6}; do
+            echo "Attempt $i..."
+            if curl -fsS -I --max-time 180 "$URL" > /dev/null; then
+              echo "Warmup OK"
+              exit 0
+            fi
+            sleep 15
+          done
+
+          echo "Warmup FAILED"
+          exit 1name: Warm up Render at 05:50 (Asia/Taipei)
+
+on:
+  schedule:
+    # GitHub Actions 用 UTC：台北 05:50 = UTC 前一天 21:50
+    - cron: "50 21 * * *"
+  workflow_dispatch:
+
+jobs:
+  warmup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Warm up (wait up to 180s, retry)
+        run: |
+          URL="https://my-tdx-api.onrender.com/api/trains"
+
+          for i in {1..6}; do
+            echo "Attempt $i..."
+            if curl -fsS -I --max-time 180 "$URL" > /dev/null; then
+              echo "Warmup OK"
+              exit 0
+            fi
+            sleep 15
+          done
+
+          echo "Warmup FAILED"
+          exit 1
