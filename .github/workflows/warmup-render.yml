@@ -3,7 +3,7 @@ name: Warm up Render at 05:50 (Asia/Taipei)
 on:
   schedule:
     # GitHub Actions uses UTC. Asia/Taipei 05:50 = 21:50 UTC (previous day)
-    - cron: "40 21 * * *"
+    - cron: "00 21 * * *"
   workflow_dispatch:
 
 jobs:
